@@ -46,7 +46,6 @@ describe('Test Socket IO API endpoints',function() {
         'Content-Length': postData.length
       }
     },function(res){
-      console.log(res.headers)
 
       sessionCookie = res.headers['set-cookie'][0];
       sessionCookie = sessionCookie.replace(/HttpOnly/, '');
@@ -78,7 +77,6 @@ describe('Test Socket IO API endpoints',function() {
   it('Should connect to through socket and fail to authenticate.', function(done) {
 
     console.log('test started!!');
-    console.log(socketAgent);
 
     var socket = io.connect(serverUrl+':'+port, {
       agent: socketAgent,
@@ -86,8 +84,6 @@ describe('Test Socket IO API endpoints',function() {
         'Cookie': sessionCookie
       }
     });
-
-    console.log(sessionCookie)
 
     socket.once('connect', function(){
       socket.emit('CreateNewGame');
