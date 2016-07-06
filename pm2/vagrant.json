@@ -1,0 +1,9 @@
+[{
+  "name": "battlegrid-api",
+  "script": "./index.js",
+  "watch": true,
+  "exec_mode": "fork_mode",
+  "instances": 1,
+  "cwd": "/var/www/battlegrid-api",
+  "max_memory_restart": "300M"
+}]

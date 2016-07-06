@@ -86,6 +86,7 @@ describe('Test Socket IO API endpoints',function() {
     });
 
     socket.once('connect', function(){
+      console.log('connected');
       socket.emit('CreateNewGame');
     });
 
