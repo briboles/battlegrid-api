@@ -8,9 +8,9 @@ chai.use(require('sinon-chai'));
 var io = require('socket.io-client');
 var querystring = require('querystring');
 var http = require('http');
-var User = require('../../lib/models/user.model');
+var User = require('../../../lib/models/user.model');
 var serverUrl = 'http://127.0.0.1';
-var port = 13001;
+var port = 13101;
 
 // Create http agent
 var socketAgent = new http.Agent({ keepAlive: true});
@@ -34,7 +34,7 @@ describe('Test Socket IO API endpoints',function() {
   var newUserId;
 
   before(function(done) {
-    require('../../lib/server.create');
+    require('../../../lib/server.create');
     var req = http.request({
       hostname: '127.0.0.1',
       port: port,
@@ -51,8 +51,8 @@ describe('Test Socket IO API endpoints',function() {
       sessionCookie = sessionCookie.replace(/HttpOnly/, '');
 
       res.setEncoding('utf8');
-      res.on('data', function(chunk){
-        console.log(chunk);
+      res.on('data', function(){
+        // Nothing to do here...
       });
       res.on('end', function(){
         return done();
@@ -70,13 +70,28 @@ describe('Test Socket IO API endpoints',function() {
     });
   });
 
-  beforeEach(function(done){
-    done();
-  });
-
   it('Should connect to through socket and fail to authenticate.', function(done) {
 
-    console.log('test started!!');
+    var socket = io.connect(serverUrl+':'+port);
+    var authFailed = sinon.spy();
+
+    socket.once('connect', function(){
+      socket.emit('CreateNewGame');
+    });
+
+    socket.on('Authentication Failed', function() {
+      authFailed();
+      socket.disconnect();
+    });
+
+    socket.on('disconnect', function(){
+      expect(authFailed).to.be.called;
+      done();
+    });
+
+  });
+
+  it('Should connect to through socket and create new game.', function(done) {
 
     var socket = io.connect(serverUrl+':'+port, {
       agent: socketAgent,
@@ -85,25 +100,7 @@ describe('Test Socket IO API endpoints',function() {
       }
     });
 
-    socket.once('connect', function(){
-      console.log('connected');
-      socket.emit('CreateNewGame');
-    });
-
-    socket.on('Authentication Failed', function() {
-      console.log('stuff and things.');
-      done();
-    });
-
-    socket.on('disconnect', function(){
-      done();
-    });
-
-  });
-/*
-  it('Should connect to through socket and create new game.', function(done) {
-
-    var socket = io(serverUrl);
+    var notCalled = sinon.spy();
 
     socket.once('connect', function(){
       socket.emit('CreateNewGame');
@@ -112,19 +109,21 @@ describe('Test Socket IO API endpoints',function() {
     socket.on('GameCreated', function(data){
       expect(data).to.contain.key('id');
       expect(data.id).to.be.a.string;
+      console.log(data)
       socket.disconnect();
     });
 
     socket.on('Authentication Failed', function() {
-      console.log('stuff and things.');
+      notCalled();
     })
 
     socket.on('disconnect', function(){
+      expect(notCalled).to.not.be.called;
       done();
     });
 
   });
-*/
+
   after(function(){
     User.findOneAndRemove({ _id: newUserId }, function(err) {
       if (err) return new Error(err);

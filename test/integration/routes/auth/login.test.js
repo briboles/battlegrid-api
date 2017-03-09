@@ -1,8 +1,8 @@
 'use strict';
 
 var request = require('supertest');
-var app = require('../../../lib/server.create');
-var User = require('../../../lib/models/user.model');
+var app = require('../../../../lib/server.create');
+var User = require('../../../../lib/models/user.model');
 
 var testUser = {
   username: 'testUser3243',

@@ -9,7 +9,7 @@ jshint **/*.js
 jshintResult=$?
 
 # Run tests and generate coverage
-istanbul cover -x 'integration/**/*' ./node_modules/mocha/bin/_mocha -- -c -R spec test integration
+istanbul cover -x 'integration/**/*' ./node_modules/mocha/bin/_mocha -- --recursive -c -R spec test/unit test/integration
 testingResult=$?
 
 # Build Clover Report for CI/CD plugin
@@ -25,7 +25,7 @@ if [ $testingResult -ne 0 ]; then echo $'\n'$'\e[31m'"  Unit / Integration Test 
 # Open Chrome to Coverage Report if under 100%
 if [ $coverageResult -ne 0 ]; then
   echo $'\n'"  Not 100% Coverage! Boooooo!"$'\n'
-    #open -a /Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome ./coverage/lcov-report/index.html
+  open -a /Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome ./coverage/lcov-report/index.html
 else
   echo $'\n'"  100% Coverage! Woohoo!"$'\n'
 fi
